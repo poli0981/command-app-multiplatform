@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CommandApp.ViewModels"
+        x:Class="CommandApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="LazyCLI - Command Buddy cho Noob"
+        Width="900" Height="600">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid ColumnDefinitions="250,*" RowDefinitions="*,Auto">
+        <!-- Left: Categories + Commands -->
+        <Grid Grid.Column="0" RowDefinitions="Auto,*">
+            <TextBlock Text="Categories" FontWeight="Bold" Margin="10"/>
+            <ListBox Grid.Row="1" ItemsSource="{Binding Categories}"
+                     SelectedItem="{Binding SelectedCategory}"
+                     Margin="10">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <!-- Right: Commands list + Detail -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto" Margin="10">
+            <TextBlock Text="{Binding SelectedCategory.Name, FallbackValue='Chọn category'}" 
+                       FontSize="18" FontWeight="Bold" Grid.Row="0"/>
+
+            <ListBox Grid.Row="1" ItemsSource="{Binding SelectedCategory.Commands}"
+                     SelectedItem="{Binding SelectedCommand}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Description}" FontStyle="Italic" Foreground="Gray"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Argument input + Run button -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,5"
+                        IsVisible="{Binding SelectedCommand.RequiresArgument}">
+                <TextBox Text="{Binding Argument}" Watermark="Nhập argument..." Width="300"/>
+                <Button Content="Run" Command="{Binding RunCommandCommand}" Margin="10,0"/>
+            </StackPanel>
+
+            <Button Grid.Row="2" Content="Run Command" 
+                    Command="{Binding RunCommandCommand}"
+                    IsVisible="{Binding !SelectedCommand.RequiresArgument}"
+                    HorizontalAlignment="Left"/>
+
+            <!-- Output -->
+            <ScrollViewer Grid.Row="3">
+                <ItemsControl ItemsSource="{Binding OutputLines}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" FontFamily="Consolas" Margin="0,2"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>
